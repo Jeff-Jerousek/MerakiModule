@@ -1,5 +1,4 @@
-﻿#Insert your API key here
-
+﻿
 $base_url = 'https://dashboard.meraki.com/api/v0'
 
 
@@ -80,25 +79,29 @@ function Get-MerakiVPN {
 
 }
 
-function Get-MerakiNetworks {
+function Get-MerakiNetworks ($orgID){
 
-    $api = @{
+    $list = New-Object System.Collections.ArrayList 
 
-        "endpoint" = 'https://dashboard.meraki.com/api/v0'
+    #if param is used
+    if ($orgID)
+    {
+        $OrganizationID = $orgID
+    }
     
+    $uri = "{0}/organizations/{1}/networks" -f $base_url, $OrganizationID
+
+    $result = Invoke-RestMethod -Method GET -Uri $uri -Headers $header
+
+    
+
+        foreach ($network in $result)
+    {
+        #$device.claimedat = [DateTimeOffset]::FromUnixTimeSeconds($($device.claimedat)) | Get-Date -Format g
+        [void]$list.Add($network)
     }
 
-    $header = @{
-        
-        "X-Cisco-Meraki-API-Key" = $api_key
-        "Content-Type" = 'application/json'
-        
-    }
-
-    $api.url = '/organizations/218691/networks'
-    $uri = $api.endpoint + $api.url
-    $request = Invoke-RestMethod -Method GET -Uri $uri -Headers $header
-    return $request
+    $list
 
 }
 
@@ -123,15 +126,13 @@ function Get-MerakiOrganizations {
 }
 
 function Get-MerakiSwitchPorts ($networkid, $serialnumber) {
-
-           
+          
     $uri = "{0}/networks/{1}/devices/{2}/switchPorts" -f $base_url, $networkid, $serialnumber
 
     Invoke-RestMethod -Method GET -Uri $uri -Headers $header
 
 
 }
-
 
 
 function Get-MerakiInventory ($orgID)
@@ -204,4 +205,84 @@ function Get-MerakiOrganization ($orgID){
     Invoke-RestMethod -Method GET -Uri $uri -Headers $header
 
 }
+
+function Get-MerakiLicenseState ($orgID){
+
+        #if param is used
+    if ($orgID)
+    {
+        $OrganizationID = $orgID
+    }
+    
+    $uri = "{0}/organizations/{1}/licenseState" -f $base_url, $OrganizationID
+
+    Invoke-RestMethod -Method GET -Uri $uri -Headers $header
+
+}
+
+
+function Get-MerakiSNMPsettings ($orgID){
+
+        #if param is used
+    if ($orgID)
+    {
+        $OrganizationID = $orgID
+    }
+    
+    $uri = "{0}/organizations/{1}/snmp" -f $base_url, $OrganizationID
+
+    Invoke-RestMethod -Method GET -Uri $uri -Headers $header
+
+}
+
+
+function Get-Meraki3rdPartyVPNpeers ($orgID){
+
+        #if param is used
+    if ($orgID)
+    {
+        $OrganizationID = $orgID
+    }
+    
+    $uri = "{0}/organizations/{1}/thirdPartyVPNPeers" -f $base_url, $OrganizationID
+
+    Invoke-RestMethod -Method GET -Uri $uri -Headers $header
+
+}
+
+
+
+function Get-MerakiPhoneAssignments ($networkID){
+
+            
+    $uri = "{0}/networks/{1}/phoneAssignments" -f $base_url, $networkid
+
+
+    Invoke-RestMethod -Method GET -Uri $uri -Headers $header
+
+}
+
+
+function Get-MerakiSAMLroles ($orgID){
+
+        #if param is used
+    if ($orgID)
+    {
+        $OrganizationID = $orgID
+    }
+    
+    $uri = "{0}/organizations/{1}/samlRoles" -f $base_url, $OrganizationID
+
+    Invoke-RestMethod -Method GET -Uri $uri -Headers $header
+
+}
+
+function Get-MerakiDeviceClients ($serialnumber)
+{
+    $uri = "{0}/devices/{1}/clients?timespan=86400" -f $base_url, $serialnumber
+
+    Invoke-RestMethod -Method GET -Uri $uri -Headers $header
+
+}
+
 
